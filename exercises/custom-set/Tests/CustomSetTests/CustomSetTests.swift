@@ -4,15 +4,163 @@ import XCTest
 class CustomSetTests: XCTestCase {
     let emptyTypedArray = [Int]()
 
-    func testEqual() {
-        XCTAssertEqual(CustomSet([1, 3]), CustomSet([3, 1]))
-        XCTAssertNotEqual(CustomSet([1, 3]), CustomSet([3, 1, 5]))
-        XCTAssertNotEqual(CustomSet([1, 3, 5]), CustomSet([3, 1]))
-        XCTAssertNotEqual(CustomSet([1, 3]), CustomSet([2, 1]))
+    func testSetsWithNoElementsAreEmpty() {
+        XCTAssertTrue(CustomSet(emptyTypedArray).isEmpty)
     }
 
-    func testNoDuplicates() {
-        XCTAssertEqual(CustomSet([1, 1]), CustomSet([1]))
+    func testSetsWithElementsAreNotEmpty() {
+        XCTAssertFalse(CustomSet([1]).isEmpty)
+    }
+
+    func testNothingIsContainedInAnEmptySet() {
+        XCTAssertFalse(CustomSet(emptyTypedArray).contains(1))
+    }
+    func testWhenTheElementIsInTheSet() {
+        XCTAssertTrue(CustomSet([1, 2, 3]).contains(1))
+    }
+    func testWhenTheElementIsNotInTheSet() {
+        XCTAssertFalse(CustomSet([1, 2, 3]).contains(4))
+    }
+
+    func testEmptySetIsASubsetOfAnotherEmptySet() {
+        XCTAssertTrue(CustomSet(emptyTypedArray).isSubsetOf(CustomSet([])))
+    }
+    func testEmptySetIsASubsetOfNonEmptySet() {
+        XCTAssertTrue(CustomSet(emptyTypedArray).isSubsetOf(CustomSet([1])))
+    }
+    func testNonEmptySetIsNotASubsetOfEmptySet() {
+        XCTAssertFalse(CustomSet([1]).isSubsetOf(CustomSet(emptyTypedArray)))
+    }
+    func testSetIsASubsetOfSetWithExactSameElements() {
+        XCTAssertTrue(CustomSet([1, 2, 3]).isSubsetOf(CustomSet([1, 2, 3])))
+    }
+    func testSetIsASubsetOfLargerSetWithSameElements() {
+        XCTAssertTrue(CustomSet([1, 2, 3]).isSubsetOf(CustomSet([4, 1, 2, 3])))
+    }
+    func testSetIsNotASubsetOfSetThatDoesNotContainItsElements() {
+        XCTAssertFalse(CustomSet([1, 2, 3]).isSubsetOf(CustomSet([4, 1, 3])))
+    }
+
+    func testTheEmptySetIsDisjointWithItself() {
+        XCTAssertTrue(CustomSet(emptyTypedArray).isDisjoint(CustomSet(emptyTypedArray)))
+    }
+    func testEmptySetIsDisjointWithNonEmptySet() {
+        XCTAssertTrue(CustomSet(emptyTypedArray).isDisjoint(CustomSet([1])))
+    }
+    func testNonEmptySetIsDisjointWithEmptySet() {
+        XCTAssertTrue(CustomSet([1]).isDisjoint(CustomSet(emptyTypedArray)))
+    }
+    func testSetsAreNotDisjointIfTheyShareAnElement() {
+        XCTAssertFalse(CustomSet([1, 2]).isDisjoint(CustomSet([2, 3])))
+    }
+    func testSetsAreDisjointIfTheyShareNoElements() {
+        XCTAssertTrue(CustomSet([1, 2]).isDisjoint(CustomSet([3, 4])))
+    }
+
+    func testEmptySetsAreEqual() {
+        XCTAssertEqual(CustomSet(emptyTypedArray), CustomSet(emptyTypedArray))
+    }
+    func testEmptySetIsNotEqualToNonEmptySet() {
+        XCTAssertNotEqual(CustomSet(emptyTypedArray), CustomSet([1, 2, 3]))
+    }
+    func testNonEmptySetIsNotEqualToEmptySet() {
+        XCTAssertNotEqual(CustomSet([1, 2, 3]), CustomSet(emptyTypedArray))
+    }
+    func testSetsWithTheSameElementsAreEqual() {
+        XCTAssertEqual(CustomSet([1, 2]), CustomSet([2, 1]))
+    }
+    func testSetsWithDifferentElementsAreNotEqual() {
+        XCTAssertNotEqual(CustomSet([1, 2, 3]), CustomSet([1, 2, 4]))
+    }
+    func testSetIsNotEqualToLargerSetWithSameElements() {
+        XCTAssertNotEqual(CustomSet([1, 2, 3]), CustomSet([1, 2, 3, 4]))
+    }
+
+    func testAddToEmptySet() {
+        let expected = CustomSet([3])
+        var actual = CustomSet(emptyTypedArray)
+        actual.add(3)
+        XCTAssertEqual(expected, actual)
+    }
+    func testAddToNonEmptySet() {
+        let expected = CustomSet([1, 2, 3, 4])
+        var actual = CustomSet([1, 2, 4])
+        actual.add(3)
+        XCTAssertEqual(expected, actual)
+    }
+    func testAddingAnExistingElementDoesNotChangeTheSet() {
+        let expected = CustomSet([1, 2, 3])
+        var actual = CustomSet([1, 2, 3])
+        actual.add(3)
+        XCTAssertEqual(expected, actual)
+    }
+
+    func testIntersectionOfTwoEmptySetsIsAnEmptySet() {
+        let expected = CustomSet(emptyTypedArray)
+        let actual = CustomSet(emptyTypedArray).intersection(CustomSet(emptyTypedArray))
+        XCTAssertEqual(expected, actual)
+    }
+    func testIntersectionOfAnEmptySetAndNonEmptySetIsAnEmptySet() {
+        let expected = CustomSet(emptyTypedArray)
+        let actual = CustomSet(emptyTypedArray).intersection(CustomSet([3, 2, 5]))
+        XCTAssertEqual(expected, actual)
+    }
+    func testIntersectionOfANonEmptySetAndAnEmptySetIsAnEmptySet() {
+        let expected = CustomSet(emptyTypedArray)
+        let actual = CustomSet([1, 2, 3, 4]).intersection(CustomSet(emptyTypedArray))
+        XCTAssertEqual(expected, actual)
+    }
+    func testIntersectionOfTwoSetsWithNoSharedElementsIsAnEmptySet() {
+        let expected = CustomSet(emptyTypedArray)
+        let actual = CustomSet([1, 2, 3]).intersection(CustomSet([4, 5, 6]))
+        XCTAssertEqual(expected, actual)
+    }
+    func testIntersectionOfTwoSetsWithSharedElementsIsASetOfTheSharedElements() {
+        let expected = CustomSet([2, 3])
+        let actual = CustomSet([1, 2, 3, 4]).intersection(CustomSet([3, 2, 5]))
+        XCTAssertEqual(expected, actual)
+    }
+
+    func testDifferenceOfTwoEmptySetsIsAnEmptySet() {
+        let expected = CustomSet(emptyTypedArray)
+        let actual = CustomSet(emptyTypedArray).difference(CustomSet(emptyTypedArray))
+        XCTAssertEqual(expected, actual)
+    }
+    func testDifferenceOfEmptySetAndNonEmptySetIsAnEmptySet() {
+        let expected = CustomSet(emptyTypedArray)
+        let actual = CustomSet(emptyTypedArray).difference(CustomSet([3, 2, 5]))
+        XCTAssertEqual(expected, actual)
+    }
+    func testDifferenceOfANonEmptySetAndAnEmptySetIsTheNonEmptySet() {
+        let expected = CustomSet([1, 2, 3, 4])
+        let actual = CustomSet([1, 2, 3, 4]).difference(CustomSet(emptyTypedArray))
+        XCTAssertEqual(expected, actual)
+    }
+    func testDifferenceOfTwoNonEmptySetsIsASetOfElementsThatAreOnlyInTheFirstSet() {
+        let expected = CustomSet([1, 3])
+        let actual = CustomSet([3, 2, 1]).difference(CustomSet([2, 4]))
+        XCTAssertEqual(expected, actual)
+    }
+
+    func testUnionOfEmptySetsIsAnEmptySet() {
+        let expected = CustomSet(emptyTypedArray)
+        let actual = CustomSet(emptyTypedArray).union(CustomSet(emptyTypedArray))
+        XCTAssertEqual(expected, actual)
+    }
+    func testUnionOfAnEmptySetAndNonEmptySetIsTheNonEmptySet() {
+        let expected = CustomSet([2])
+        let actual = CustomSet(emptyTypedArray).union(CustomSet([2]))
+        XCTAssertEqual(expected, actual)
+    }
+    func testUnionOfANonEmptySetAndEmptySetIsTheNonEmptySet() {
+        let expected = CustomSet([1, 3])
+        let actual = CustomSet([1, 3]).union(CustomSet(emptyTypedArray))
+        XCTAssertEqual(expected, actual)
+    }
+    func testUnionOfNonEmptySetsContainsAllUniqueElements() {
+        let expected = CustomSet([3, 2, 1])
+        let actual = CustomSet([1, 3]).union(CustomSet([2, 3]))
+        XCTAssertEqual(expected, actual)
     }
 
     func testDeleteMethod() {
@@ -26,53 +174,14 @@ class CustomSetTests: XCTestCase {
         XCTAssertEqual(CustomSet([1, 2, 3]), expected2)
     }
 
-    func testDifference() {
-        XCTAssertEqual(CustomSet([1, 3]),
-                       CustomSet([1, 2, 3]).difference(CustomSet([2, 4])))
-        XCTAssertEqual(CustomSet([2, 3]),
-                       CustomSet([1, 2, 3, 4]).difference(CustomSet([1, 4])))
-
-    }
-
-    func testDisjoint() {
-        XCTAssertTrue(CustomSet([1, 2]).isDisjoint(CustomSet([3, 4])))
-        XCTAssertFalse(CustomSet([1, 2]).isDisjoint(CustomSet([2, 3])))
-        XCTAssertFalse(CustomSet([1.0, 2.0]).isDisjoint(CustomSet([2.0, 3.0])))
-    }
-
-    func testEmptyMethod() {
+    func testRemoveAllMethod() {
         var expected1 = CustomSet([1, 2])
         expected1.removeAll()
-        XCTAssertEqual(CustomSet(emptyTypedArray ), expected1 )
+        XCTAssertEqual(CustomSet(emptyTypedArray), expected1)
 
-        var expected2 = CustomSet(emptyTypedArray )
+        var expected2 = CustomSet(emptyTypedArray)
         expected2.removeAll()
-        XCTAssertEqual(CustomSet(emptyTypedArray ), expected2 )
-    }
-    func testIntersection() {
-        XCTAssertEqual(CustomSet(["a", "c"]),
-                       CustomSet(["a", "b", "c"]).intersection(CustomSet(["a", "c", "d"])))
-
-        XCTAssertEqual(CustomSet([3.0]),
-                       CustomSet([1.0, 2.0, 3.0]).intersection(CustomSet([3.0])))
-    }
-
-    func testMember() {
-        XCTAssertTrue(CustomSet([1, 2, 3]).containsMember(2))
-        XCTAssertTrue(CustomSet([1, 2, 3]).containsMember(3))
-        XCTAssertFalse(CustomSet([1, 2, 3]).containsMember(4))
-    }
-
-    func testPutMethod() {
-        var expected1 = CustomSet([1, 2, 4])
-        expected1.put(3)
-        XCTAssertEqual(CustomSet([1, 2, 3, 4]),
-                       expected1)
-
-        var expected2 = CustomSet([1, 2, 3])
-        expected2.put(3)
-        XCTAssertEqual(CustomSet([1, 2, 3]),
-                       expected2)
+        XCTAssertEqual(CustomSet(emptyTypedArray), expected2)
     }
 
     func testSize() {
@@ -81,48 +190,55 @@ class CustomSetTests: XCTestCase {
         XCTAssertEqual(3, CustomSet([1, 2, 3, 2]).size)
     }
 
-    func testSubsetMethod() {
-        XCTAssertTrue(CustomSet([1, 2, 3]).isSupersetOf(CustomSet([1, 2, 3])))
-        XCTAssertTrue(CustomSet([4, 1, 2, 3]).isSupersetOf(CustomSet([1, 2, 3])))
-        XCTAssertFalse(CustomSet([4, 1, 3]).isSupersetOf(CustomSet([1, 2, 3])))
-        XCTAssertFalse(CustomSet([1, 2, 3, 4]).isSupersetOf(CustomSet([1, 2, 5])))
-        XCTAssertTrue(CustomSet([4, 1, 3]).isSupersetOf(CustomSet(emptyTypedArray)))
-        XCTAssertTrue(CustomSet(emptyTypedArray).isSupersetOf(CustomSet(emptyTypedArray)))
-    }
-
     func testToA() {
         XCTAssertEqual([1, 2, 3], CustomSet([3, 1, 2]).toSortedArray)
         XCTAssertEqual([1, 2, 3], CustomSet([3, 1, 2, 1]).toSortedArray)
     }
 
-    func testUnion() {
-        XCTAssertEqual(CustomSet([3, 2, 1]),
-                       CustomSet([1, 3]).union(CustomSet([2])))
-        XCTAssertEqual(CustomSet([3.0, 3, 2, 1]),
-                       CustomSet([1, 3]).union(CustomSet([2, 3.0])))
-        XCTAssertEqual(CustomSet([3, 1]),
-                       CustomSet([1, 3]).union(CustomSet(emptyTypedArray)))
-        XCTAssertEqual(CustomSet([2]),
-                       CustomSet([2]).union(CustomSet(emptyTypedArray)))
-        XCTAssertEqual(CustomSet(emptyTypedArray),
-                       CustomSet(emptyTypedArray).union(CustomSet(emptyTypedArray)))
-    }
-
     static var allTests: [(String, (CustomSetTests) -> () throws -> Void)] {
         return [
-            ("testEqual", testEqual),
-            ("testNoDuplicates", testNoDuplicates),
+            ("testSetsWithNoElementsAreEmpty", testSetsWithNoElementsAreEmpty),
+            ("testSetsWithElementsAreNotEmpty", testSetsWithElementsAreNotEmpty),
+            ("testNothingIsContainedInAnEmptySet", testNothingIsContainedInAnEmptySet),
+            ("testWhenTheElementIsInTheSet", testWhenTheElementIsInTheSet),
+            ("testWhenTheElementIsNotInTheSet", testWhenTheElementIsNotInTheSet),
+            ("testEmptySetIsASubsetOfAnotherEmptySet", testEmptySetIsASubsetOfAnotherEmptySet),
+            ("testEmptySetIsASubsetOfNonEmptySet", testEmptySetIsASubsetOfNonEmptySet),
+            ("testNonEmptySetIsNotASubsetOfEmptySet", testNonEmptySetIsNotASubsetOfEmptySet),
+            ("testSetIsASubsetOfSetWithExactSameElements", testSetIsASubsetOfSetWithExactSameElements),
+            ("testSetIsASubsetOfLargerSetWithSameElements", testSetIsASubsetOfLargerSetWithSameElements),
+            ("testSetIsNotASubsetOfSetThatDoesNotContainItsElements", testSetIsNotASubsetOfSetThatDoesNotContainItsElements),
+            ("testTheEmptySetIsDisjointWithItself", testTheEmptySetIsDisjointWithItself),
+            ("testEmptySetIsDisjointWithNonEmptySet", testEmptySetIsDisjointWithNonEmptySet),
+            ("testNonEmptySetIsDisjointWithEmptySet", testNonEmptySetIsDisjointWithEmptySet),
+            ("testSetsAreNotDisjointIfTheyShareAnElement", testSetsAreNotDisjointIfTheyShareAnElement),
+            ("testSetsAreDisjointIfTheyShareNoElements", testSetsAreDisjointIfTheyShareNoElements),
+            ("testEmptySetsAreEqual", testEmptySetsAreEqual),
+            ("testEmptySetIsNotEqualToNonEmptySet", testEmptySetIsNotEqualToNonEmptySet),
+            ("testNonEmptySetIsNotEqualToEmptySet", testNonEmptySetIsNotEqualToEmptySet),
+            ("testSetsWithTheSameElementsAreEqual", testSetsWithTheSameElementsAreEqual),
+            ("testSetsWithDifferentElementsAreNotEqual", testSetsWithDifferentElementsAreNotEqual),
+            ("testSetIsNotEqualToLargerSetWithSameElements", testSetIsNotEqualToLargerSetWithSameElements),
+            ("testAddToEmptySet", testAddToEmptySet),
+            ("testAddToNonEmptySet", testAddToNonEmptySet),
+            ("testAddingAnExistingElementDoesNotChangeTheSet", testAddingAnExistingElementDoesNotChangeTheSet),
+            ("testIntersectionOfTwoEmptySetsIsAnEmptySet", testIntersectionOfTwoEmptySetsIsAnEmptySet),
+            ("testIntersectionOfAnEmptySetAndNonEmptySetIsAnEmptySet", testIntersectionOfAnEmptySetAndNonEmptySetIsAnEmptySet),
+            ("testIntersectionOfANonEmptySetAndAnEmptySetIsAnEmptySet", testIntersectionOfANonEmptySetAndAnEmptySetIsAnEmptySet),
+            ("testIntersectionOfTwoSetsWithNoSharedElementsIsAnEmptySet", testIntersectionOfTwoSetsWithNoSharedElementsIsAnEmptySet),
+            ("testIntersectionOfTwoSetsWithSharedElementsIsASetOfTheSharedElements", testIntersectionOfTwoSetsWithSharedElementsIsASetOfTheSharedElements),
+            ("testDifferenceOfTwoEmptySetsIsAnEmptySet", testDifferenceOfTwoEmptySetsIsAnEmptySet),
+            ("testDifferenceOfEmptySetAndNonEmptySetIsAnEmptySet", testDifferenceOfEmptySetAndNonEmptySetIsAnEmptySet),
+            ("testDifferenceOfANonEmptySetAndAnEmptySetIsTheNonEmptySet", testDifferenceOfANonEmptySetAndAnEmptySetIsTheNonEmptySet),
+            ("testDifferenceOfTwoNonEmptySetsIsASetOfElementsThatAreOnlyInTheFirstSet", testDifferenceOfTwoNonEmptySetsIsASetOfElementsThatAreOnlyInTheFirstSet),
+            ("testUnionOfEmptySetsIsAnEmptySet", testUnionOfEmptySetsIsAnEmptySet),
+            ("testUnionOfAnEmptySetAndNonEmptySetIsTheNonEmptySet", testUnionOfAnEmptySetAndNonEmptySetIsTheNonEmptySet),
+            ("testUnionOfANonEmptySetAndEmptySetIsTheNonEmptySet", testUnionOfANonEmptySetAndEmptySetIsTheNonEmptySet),
+            ("testUnionOfNonEmptySetsContainsAllUniqueElements", testUnionOfNonEmptySetsContainsAllUniqueElements),
             ("testDeleteMethod", testDeleteMethod),
-            ("testDifference", testDifference),
-            ("testDisjoint", testDisjoint),
-            ("testEmptyMethod", testEmptyMethod),
-            ("testIntersection", testIntersection),
-            ("testMember", testMember),
-            ("testPutMethod", testPutMethod),
+            ("testRemoveAllMethod", testRemoveAllMethod),
             ("testSize", testSize),
-            ("testSubsetMethod", testSubsetMethod),
             ("testToA", testToA),
-            ("testUnion", testUnion),
         ]
     }
 }
