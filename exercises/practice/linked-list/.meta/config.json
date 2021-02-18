@@ -3,7 +3,9 @@
   "files": {
     "solution": [],
     "test": [],
-    "example": []
+    "example": [
+      ".meta/Sources/LinkedList/LinkedListExample.swift"
+    ]
   },
   "source": "Classic computer science topic"
 }
